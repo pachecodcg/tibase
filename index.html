@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ti-Base Bonding Protocol Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #003359;
+    --navy-dark: #002240;
+    --navy-light: #0a4a75;
+    --navy-mid: #336685;
+    --navy-soft: #5c8da8;
+    --green: #44D62C;
+    --green-dark: #38b024;
+    --green-light: #5ae048;
+    --green-bg: #d9f5d5;
+    --green-bg-light: #eafae6;
+    --silver: #A5ACAF;
+    --silver-light: #c5cacc;
+    --silver-lighter: #d0d5d8;
+    --silver-bg: #f0f2f3;
+    --page-bg: #EEEEEE;
+    --white: #ffffff;
+    --text-muted: #58676e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--page-bg);
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #002240 0%, #003359 60%, #0a4a75 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 52px 28px 44px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(68,214,44,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(165,172,175,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero .stripe {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--green);
+    transform-origin: left;
+    animation: stripeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes stripeIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .hero-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--green);
+    color: var(--navy-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: clamp(22px, 3.5vw, 26px);
+    letter-spacing: -0.3px;
+    color: var(--white);
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .hero-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--silver-light);
+    line-height: 1.55;
+    max-width: 720px;
+  }
+  .hero-sub strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+  .hero-meta {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+  }
+  .hero-meta-item {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--silver);
+  }
+  .hero-meta-item span {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  /* ── PRINT BUTTON ── */
+  .print-bar {
+    max-width: 1080px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .print-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--navy);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .print-btn:hover {
+    background: var(--navy-light);
+    box-shadow: 0 4px 12px rgba(0,51,89,0.15);
+  }
+  .print-btn svg { width: 16px; height: 16px; fill: var(--white); }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* ── KICKER ── */
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .kicker::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+  .kicker-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .section-desc {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.55;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: 10px;
+    border-top: 3px solid var(--navy);
+    box-shadow: 0 1px 5px rgba(0,51,89,0.07);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+    animation: fadeUp 0.5s ease forwards;
+    opacity: 0;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,51,89,0.1); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.2s; }
+
+  .card-header {
+    background: var(--navy);
+    padding: 16px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .card-header-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+  .card-header-badge {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--green);
+    color: var(--navy-dark);
+    padding: 4px 12px;
+    border-radius: 3px;
+  }
+  .card-body { padding: 26px; }
+
+  /* ── GROUP CARD SPECIFICS ── */
+  .materials-box {
+    background: var(--silver-bg);
+    border-left: 3px solid var(--navy-light);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+  }
+  .materials-box-header {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--navy-light);
+    margin-bottom: 8px;
+  }
+  .materials-box p {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+  .materials-box .ref {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--silver);
+    letter-spacing: 0.3px;
+  }
+
+  .phase-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+  .phase-label::before {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 2px;
+    background: var(--green);
+  }
+  .phase-label span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+  }
+  .phase-label:first-of-type { margin-top: 0; }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: step-counter;
+  }
+  .step-list li {
+    counter-increment: step-counter;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--silver-bg);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.55;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(step-counter);
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .note-box {
+    background: var(--green-bg);
+    border-left: 4px solid var(--green-dark);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+  .note-box-header {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+  }
+  .note-box p {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.55;
+  }
+
+  .concern-box {
+    background: var(--silver-bg);
+    border-left: 4px solid var(--silver);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+  .concern-box-header {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--navy-light);
+    margin-bottom: 6px;
+  }
+  .concern-box p {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.55;
+  }
+
+  /* ── CURE BADGE ── */
+  .cure-badge {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 9px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    background: var(--navy-dark);
+    color: var(--green);
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-top: 14px;
+  }
+
+  /* ── SPECIMEN TABLE ── */
+  .specimen-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+  .specimen-table thead th {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  .specimen-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--silver-bg);
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    color: var(--navy);
+    vertical-align: top;
+  }
+  .specimen-table tbody tr:last-child td { border-bottom: none; }
+  .specimen-table .group-code {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--navy);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    position: relative;
+  }
+  .footer::before {
+    content: '';
+    display: block;
+    width: 280px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--silver-lighter), transparent);
+    margin: 0 auto 20px;
+  }
+  .footer p {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    color: var(--silver);
+    line-height: 1.6;
+  }
+
+  /* ── SPACER ── */
+  .section-spacer { height: 36px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .hero { padding: 36px 18px 32px; }
+    .card-header { padding: 14px 18px; }
+    .card-body { padding: 18px; }
+    .hero-meta { flex-direction: column; gap: 6px; }
+    .materials-box { padding: 12px 14px; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; }
+    .hero { 
+      background: var(--navy) !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .card { 
+      box-shadow: none; 
+      break-inside: avoid;
+      border: 1px solid var(--silver-lighter);
+    }
+    .card:hover { box-shadow: none; }
+    .card, .card * { animation: none !important; opacity: 1 !important; }
+    .print-bar { display: none; }
+    .card-header {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .step-list li::before {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .materials-box, .note-box, .concern-box, .cure-badge, .hero-badge, .card-header-badge,
+    .specimen-table thead th {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="stripe"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">Laboratory Protocol</div>
+    <h1>Push-out Bond Strength Between Ti-Base and Zirconia Using Varied Bonding Protocols</h1>
+    <p class="hero-sub">Step-by-step cementation guide for all experimental groups. All specimens are self-cured with no light activation to replicate the clinical condition and standardize curing across groups.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span>PIs</span>&ensp;Tarrazzi &amp; Pacheco</div>
+      <div class="hero-meta-item"><span>Groups</span>&ensp;4 (n=10 each)</div>
+      <div class="hero-meta-item"><span>Cure Mode</span>&ensp;Self-cure (all groups)</div>
+      <div class="hero-meta-item"><span>Zirconia</span>&ensp;KATANA HTML PLUS 4Y-TZP, Kuraray Noritake</div>
+      <div class="hero-meta-item"><span>Storage</span>&ensp;72 h in distilled water at 37 &deg;C</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PRINT ═══════════ -->
+<div class="print-bar">
+  <button class="print-btn" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+    Print Protocol
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- ═══════════ SPECIMENS ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">Specimens &amp; Components</span></div>
+  <h2 class="section-title">Materials Overview</h2>
+  <p class="section-desc">Specimens were milled from pre-sintered high-translucency 4Y-TZP discs (KATANA Zirconia HTML PLUS, shade A2; Lot# EPQNZ and EPWWX, Kuraray Noritake Dental Inc., Tokyo, Japan) with a 5-axis milling unit (Model 580DC; XTCERA, Shenzhen, China), incorporating a 20 &micro;m overmill to facilitate cement space and adaptation. Specimens were sintered in a high-temperature furnace (HTS-2/M/Zirkon-120; MIHM-VOGT GmbH &amp; Co. KG, Stutensee, Germany) using the manufacturer&rsquo;s standard sintering program: heating rate of 10 &deg;C/min to 1550 &deg;C, 2-hour hold at peak temperature, followed by controlled furnace cooling with removal at 800 &deg;C (total cycle approximately 7 hours). These are the same discs used in the connector study (Ramos, Pacheco et al., submitted to JPD).</p>
+
+  <div class="card" style="animation-delay:0.05s;">
+    <div class="card-body">
+      <table class="specimen-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Product</th>
+            <th>Manufacturer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="group-code">Zirconia</td>
+            <td>KATANA Zirconia HTML PLUS, shade A2, 4Y-TZP<br><span class="ref" style="font-family:'Montserrat';font-size:10px;font-weight:600;color:#A5ACAF;">Lot# EPQNZ &amp; EPWWX</span><br><span style="font-size:12px;color:#58676e;">Milled: 5-axis 580DC (XTCERA) &ensp;|&ensp; Sintered: HTS-2/M/Zirkon-120 (MIHM-VOGT) &ensp;|&ensp; 20 &micro;m overmill</span></td>
+            <td>Kuraray Noritake Dental Inc., Tokyo, Japan</td>
+          </tr>
+          <tr>
+            <td class="group-code">Ti-Base</td>
+            <td>Ti Base for General Multi Unit<br><span class="ref" style="font-family:'Montserrat';font-size:10px;font-weight:600;color:#A5ACAF;">REF# CMU-300134 &ensp;|&ensp; Lot# 24-000798</span></td>
+            <td>Surcam Medical Devices &amp; Development Ltd., Nahariya, Israel</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ COMMON PREP ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">Before You Begin</span></div>
+  <h2 class="section-title">Common Surface Preparation</h2>
+  <p class="section-desc">Perform these steps for every specimen in every group before moving to the group-specific protocol.</p>
+
+  <div class="card" style="animation-delay:0.08s;">
+    <div class="card-header">
+      <span class="card-header-title">Surface Preparation (All Groups)</span>
+      <span class="card-header-badge">Universal</span>
+    </div>
+    <div class="card-body">
+      <ol class="step-list">
+        <li>Air-abrade the intaglio (bonding) surface of each zirconia specimen with 50 µm aluminum oxide at approximately 2 bar, 10 mm distance, for 15 seconds.</li>
+        <li>Ultrasonically clean in isopropanol for 3 minutes (or steam clean). Dry completely with oil-free compressed air.</li>
+        <li>Clean the bonding surface of each Ti-base with isopropanol on gauze or microbrush. Dry completely.</li>
+        <li>From this point forward, handle specimens only with clean cotton pliers or clean gloves. Do not touch bonding surfaces with bare fingers or contaminated instruments.</li>
+      </ol>
+      <div class="concern-box">
+        <div class="concern-box-header">Contamination Warning</div>
+        <p>If a primed or cleaned surface is contaminated at any point (moisture, saliva, powder residue from gloves, accidental touch), re-clean the surface and re-prime from the beginning. Do not proceed with a contaminated surface.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ GROUP CARDS ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">Experimental Groups</span></div>
+  <h2 class="section-title">Group-Specific Bonding Protocols</h2>
+  <p class="section-desc">Each group follows its own primer and cement combination. All groups are cured by chemical (self-cure) mechanism only, with no light activation.</p>
+
+  <!-- ── GROUP 1 ── -->
+  <div class="card" style="animation-delay:0.1s;">
+    <div class="card-header">
+      <span class="card-header-title">Group 1: MBML (n=10)</span>
+      <span class="card-header-badge">Ivoclar</span>
+    </div>
+    <div class="card-body">
+      <div class="materials-box">
+        <div class="materials-box-header">Materials</div>
+        <p><strong>Primer:</strong> Monobond Plus (Ivoclar Vivadent AG, Schaan, Liechtenstein)</p>
+        <span class="ref">REF# 626221AN &ensp;|&ensp; Lot# Z05GC4</span>
+        <p style="margin-top:8px;"><strong>Cement:</strong> Multilink Automix (Ivoclar Vivadent AG, Schaan, Liechtenstein)</p>
+        <span class="ref">REF# 615218WW &ensp;|&ensp; Lot# Z05HYT</span>
+      </div>
+
+      <div class="phase-label"><span>Priming: Both Surfaces</span></div>
+      <ol class="step-list">
+        <li>Apply a thin layer of Monobond Plus to the intaglio surface of the zirconia with a clean microbrush.</li>
+        <li>Apply Monobond Plus to the bonding surface of the Ti-base with a separate clean microbrush.</li>
+        <li>Allow both surfaces to react for 60 seconds.</li>
+        <li>Disperse excess with a strong stream of oil-free air on both surfaces. Each surface should show a thin, uniform film.</li>
+      </ol>
+
+      <div class="phase-label"><span>Cementation</span></div>
+      <ol class="step-list" style="counter-reset: step-counter 4;">
+        <li>Dispense Multilink Automix from the automix syringe. Discard the first small extrusion to ensure proper mix ratio.</li>
+        <li>Apply cement to the intaglio surface of the zirconia.</li>
+        <li>Seat the Ti-base into the zirconia with firm, steady finger pressure.</li>
+        <li>Remove gross excess with a microbrush before gel phase. After initial set, carefully inspect the margins and remove all residual cement flush with the zirconia/Ti-base junction using a scaler or blade. No cement should extend beyond the margin or remain on the external surface of the Ti-base, as any residual material will interfere with the push-out fixture and compromise the test.</li>
+        <li>Allow to self-cure undisturbed. Do not light-cure. Minimum 5 minutes from start of mix.</li>
+        <li>Record the time of cementation and specimen ID.</li>
+      </ol>
+      <span class="cure-badge">Self-cure &middot; min 5 min &middot; no light</span>
+    </div>
+  </div>
+
+  <!-- ── GROUP 2 ── -->
+  <div class="card" style="animation-delay:0.15s;">
+    <div class="card-header">
+      <span class="card-header-title">Group 2: MZGC (n=10)</span>
+      <span class="card-header-badge">GC</span>
+    </div>
+    <div class="card-body">
+      <div class="materials-box">
+        <div class="materials-box-header">Materials</div>
+        <p><strong>Primer:</strong> Metal Primer Z (GC Europe N.V., Leuven, Belgium)</p>
+        <span class="ref">REF# 009295 &ensp;|&ensp; Lot# 2304211</span>
+        <p style="margin-top:8px;"><strong>Cement:</strong> G-CEM ONE, white opaque (GC Corporation, Tokyo, Japan)</p>
+        <span class="ref">REF# 013676 &ensp;|&ensp; Lot# 2212091</span>
+      </div>
+
+      <div class="phase-label"><span>Priming: Ti-Base Only</span></div>
+      <ol class="step-list">
+        <li>Apply Metal Primer Z to the bonding surface of the Ti-base only, using a clean microbrush.</li>
+        <li>Allow to air dry for 5 to 10 seconds. The ethanol solvent evaporates quickly. The surface should appear glossy. Do not rinse.</li>
+      </ol>
+
+      <div class="note-box">
+        <div class="note-box-header">Zirconia Surface</div>
+        <p>No separate primer is applied to the zirconia in this group. G-CEM ONE is a self-adhesive resin cement that bonds directly to the air-abraded zirconia surface (per manufacturer IFU).</p>
+      </div>
+
+      <div class="phase-label"><span>Cementation</span></div>
+      <ol class="step-list" style="counter-reset: step-counter 2;">
+        <li>Dispense G-CEM ONE from the automix syringe. Discard the first extrusion.</li>
+        <li>Apply cement to the intaglio surface of the zirconia.</li>
+        <li>Seat the Ti-base into the zirconia with firm, steady finger pressure.</li>
+        <li>Remove gross excess with a microbrush. After initial set, carefully remove all residual cement flush with the zirconia/Ti-base junction using a scaler or blade. No cement should extend beyond the margin or remain on the external surface of the Ti-base, as residual material will interfere with the push-out fixture.</li>
+        <li>Allow to self-cure undisturbed. Do not light-cure. Minimum 6 minutes from start of mix.</li>
+        <li>Record the time of cementation and specimen ID.</li>
+      </ol>
+      <span class="cure-badge">Self-cure &middot; min 6 min &middot; no light</span>
+    </div>
+  </div>
+
+  <!-- ── GROUP 3 ── -->
+  <div class="card" style="animation-delay:0.2s;">
+    <div class="card-header">
+      <span class="card-header-title">Group 3: GCEM (n=10)</span>
+      <span class="card-header-badge">GC</span>
+    </div>
+    <div class="card-body">
+      <div class="materials-box">
+        <div class="materials-box-header">Materials</div>
+        <p><strong>Primer:</strong> G-CEM ONE Adhesive Enhancing Primer (GC Dental Products Corp., Aichi, Japan)</p>
+        <span class="ref">REF# 013642 &ensp;|&ensp; Lot# 2308244</span>
+        <p style="margin-top:8px;"><strong>Cement:</strong> G-CEM ONE, white opaque (GC Corporation, Tokyo, Japan)</p>
+        <span class="ref">REF# 013676 &ensp;|&ensp; Lot# 2212091</span>
+      </div>
+
+      <div class="phase-label"><span>Priming: Both Surfaces</span></div>
+      <ol class="step-list">
+        <li>Apply a thin coat of G-CEM Adhesive Enhancing Primer to the intaglio surface of the zirconia using a microbrush.</li>
+        <li>Apply G-CEM Adhesive Enhancing Primer to the bonding surface of the Ti-base with a separate clean microbrush.</li>
+        <li>Gently air dry both surfaces for approximately 5 seconds. Do not rinse. Surfaces should appear uniformly wet/glossy.</li>
+      </ol>
+
+      <div class="phase-label"><span>Cementation</span></div>
+      <ol class="step-list" style="counter-reset: step-counter 3;">
+        <li>Dispense G-CEM ONE from the automix syringe. Discard the first extrusion.</li>
+        <li>Apply cement to the intaglio surface of the zirconia.</li>
+        <li>Seat the Ti-base into the zirconia with firm, steady finger pressure.</li>
+        <li>Remove gross excess with a microbrush. After initial set, carefully remove all residual cement flush with the zirconia/Ti-base junction using a scaler or blade. No cement should extend beyond the margin or remain on the external surface of the Ti-base, as residual material will interfere with the push-out fixture.</li>
+        <li>Allow to self-cure undisturbed. Do not light-cure. Minimum 6 minutes from start of mix.</li>
+        <li>Record the time of cementation and specimen ID.</li>
+      </ol>
+      <span class="cure-badge">Self-cure &middot; min 6 min &middot; no light</span>
+    </div>
+  </div>
+
+  <!-- ── GROUP 4 ── -->
+  <div class="card" style="animation-delay:0.25s;">
+    <div class="card-header">
+      <span class="card-header-title">Group 4: MLHA (n=10)</span>
+      <span class="card-header-badge">Ivoclar</span>
+    </div>
+    <div class="card-body">
+      <div class="materials-box">
+        <div class="materials-box-header">Materials</div>
+        <p><strong>Primer:</strong> Monobond Plus (Ivoclar Vivadent AG, Schaan, Liechtenstein)</p>
+        <span class="ref">REF# 626221AN &ensp;|&ensp; Lot# Z05GC4</span>
+        <p style="margin-top:8px;"><strong>Cement:</strong> Multilink Hybrid Abutment (Ivoclar Vivadent AG, Schaan, Liechtenstein)</p>
+        <span class="ref">REF# 647182AN &ensp;|&ensp; Lot# Z05MRD</span>
+      </div>
+
+      <div class="phase-label"><span>Priming: Both Surfaces</span></div>
+      <ol class="step-list">
+        <li>Apply Monobond Plus to the intaglio surface of the zirconia with a clean microbrush.</li>
+        <li>Apply Monobond Plus to the bonding surface of the Ti-base with a separate clean microbrush.</li>
+        <li>Allow both surfaces to react for 60 seconds.</li>
+        <li>Disperse excess with a strong stream of oil-free air on both surfaces. Thin, uniform film on each.</li>
+      </ol>
+
+      <div class="phase-label"><span>Cementation</span></div>
+      <ol class="step-list" style="counter-reset: step-counter 4;">
+        <li>Dispense Multilink Hybrid Abutment from the automix syringe. Discard the first extrusion.</li>
+        <li>Apply cement to the intaglio surface of the zirconia.</li>
+        <li>Seat the Ti-base into the zirconia with firm, steady finger pressure.</li>
+        <li>Remove gross excess with a microbrush before gel phase. After initial set, carefully remove all residual cement flush with the zirconia/Ti-base junction using a scaler or blade. No cement should extend beyond the margin or remain on the external surface of the Ti-base, as residual material will interfere with the push-out fixture.</li>
+        <li>Allow to self-cure undisturbed. This cement is chemical cure only by design. Minimum 7 minutes.</li>
+        <li>Record the time of cementation and specimen ID.</li>
+      </ol>
+      <span class="cure-badge">Chemical cure only &middot; min 7 min</span>
+
+      <div class="note-box" style="margin-top:18px;">
+        <div class="note-box-header">Why Chemical Cure Only</div>
+        <p>Multilink Hybrid Abutment is designed exclusively for chemical polymerization. Ivoclar engineered this product for the Ti-base/zirconia interface where light access is impossible in clinical use. All other groups also use self-cure mode to standardize the curing protocol across the study.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SUMMARY TABLE ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">Quick Reference</span></div>
+  <h2 class="section-title">Group Comparison at a Glance</h2>
+
+  <div class="card" style="animation-delay:0.05s;">
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="specimen-table" style="margin:0;">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Primer</th>
+            <th>Applied To</th>
+            <th>Cement</th>
+            <th>Cure</th>
+            <th>Min Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="group-code">MBML</td>
+            <td>Monobond Plus</td>
+            <td>Both</td>
+            <td>Multilink Automix</td>
+            <td>Self-cure</td>
+            <td>5 min</td>
+          </tr>
+          <tr>
+            <td class="group-code">MZGC</td>
+            <td>Metal Primer Z</td>
+            <td>Ti-base only</td>
+            <td>G-CEM ONE</td>
+            <td>Self-cure</td>
+            <td>6 min</td>
+          </tr>
+          <tr>
+            <td class="group-code">GCEM</td>
+            <td>G-CEM AEP</td>
+            <td>Both</td>
+            <td>G-CEM ONE</td>
+            <td>Self-cure</td>
+            <td>6 min</td>
+          </tr>
+          <tr>
+            <td class="group-code">MLHA</td>
+            <td>Monobond Plus</td>
+            <td>Both</td>
+            <td>Multilink Hybrid Abutment</td>
+            <td>Chemical only</td>
+            <td>7 min</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ POST-CEMENTATION ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">After Bonding</span></div>
+  <h2 class="section-title">Post-Cementation &amp; Testing</h2>
+  <p class="section-desc">These steps apply to all bonded specimens regardless of group.</p>
+
+  <div class="card" style="animation-delay:0.05s;">
+    <div class="card-header">
+      <span class="card-header-title">Storage &amp; Push-out Testing</span>
+      <span class="card-header-badge">All Groups</span>
+    </div>
+    <div class="card-body">
+      <ol class="step-list">
+        <li>After full cure, verify that all excess cement has been completely removed from each specimen. Inspect under magnification if needed. The push-out plunger must contact only the Ti-base; any residual cement at the margin will bear against the fixture, artificially increase the recorded load, and invalidate the measurement.</li>
+        <li>Store all bonded specimens in distilled water at 37 &deg;C for 72 hours before testing (bond Friday, test Monday). Ensure all 40 specimens are bonded on the same day and tested on the same day for consistency.</li>
+        <li>Mount each specimen in the custom stainless steel push-out fixture.</li>
+        <li>Test on the Instron 5544 at a crosshead speed of 1.0 mm/min until failure.</li>
+        <li>Record maximum load at failure in Newtons (N).</li>
+        <li>Calculate push-out bond strength using the predefined formula.</li>
+        <li>Examine debonded surfaces under the Olympus optical microscope.</li>
+        <li>Classify failure mode: adhesive, cohesive in Ti-base, cohesive in zirconia, or mixed.</li>
+        <li>Select representative specimens for SEM analysis (collaboration with Federal University of Uberlandia).</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ═══════════ GENERAL NOTES ═══════════ -->
+  <div class="section-spacer"></div>
+  <div class="kicker"><span class="kicker-text">Important Reminders</span></div>
+  <h2 class="section-title">General Notes</h2>
+
+  <div class="card" style="animation-delay:0.05s;">
+    <div class="card-body">
+      <div class="note-box" style="margin-top:0;">
+        <div class="note-box-header">Critical: Cement Removal for Push-out Testing</div>
+        <p>This is a push-out bond strength test. The plunger in the custom stainless steel fixture applies compressive force directly to the Ti-base to dislodge it from the zirconia. If any cured cement remains on the external surface of the Ti-base or extends beyond the zirconia/Ti-base margin, it will bear against the fixture wall during loading. This creates a false resistance that inflates the recorded failure load and does not represent the actual bond strength at the cementation interface. After bonding, carefully inspect each specimen and remove every trace of excess cement from the margin and external Ti-base surfaces using a scaler, blade, or finishing bur under magnification. The bonding interface should be the only connection between the two components.</p>
+      </div>
+      <div class="concern-box">
+        <div class="concern-box-header">Seating Pressure</div>
+        <p>Maintain a consistent seating load across all specimens. If a custom jig or standardized weight is available, use it. If using finger pressure, keep it as uniform as possible across operators and specimens.</p>
+      </div>
+      <div class="concern-box">
+        <div class="concern-box-header">Labeling</div>
+        <p>Label each specimen clearly with group abbreviation and specimen number (e.g., MBML-01, MZGC-05) before bonding. Photograph relevant steps for the methods write-up if needed.</p>
+      </div>
+      <div class="concern-box">
+        <div class="concern-box-header">Automix Syringe Tip</div>
+        <p>Always discard the first small extrusion from each automix syringe to ensure the base and catalyst are mixing at the correct ratio. Replace the mixing tip if more than 10 minutes have passed since the last extrusion.</p>
+      </div>
+      <div class="concern-box">
+        <div class="concern-box-header">Statistical Analysis</div>
+        <p>Data will be analyzed using one-way ANOVA and Tukey multiple comparison test (alpha = 0.05) in GraphPad Prism 10.</p>
+      </div>
+      <div class="concern-box">
+        <div class="concern-box-header">Storage Timing (72 Hours)</div>
+        <p>Bond all 40 specimens on Friday. Store in distilled water at 37 &deg;C. Test all on Monday (~72 hours). The 72-hour storage ensures full polymerization of all cements, particularly the chemical-cure-only Multilink Hybrid Abutment, which may not reach maximum degree of conversion by 24 hours. This eliminates incomplete curing as a confounding variable. In the methods, report: &ldquo;Specimens were stored in distilled water at 37 &deg;C for 72 hours prior to testing.&rdquo;</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<div class="footer">
+  <p>Dental College of Georgia at Augusta University &ensp;|&ensp; Section of Dental Materials &ensp;|&ensp; GC2010 / GC2012</p>
+  <p style="margin-top:4px;">PIs: Daler E. Tarrazzi, DDS, MS &ensp;&amp;&ensp; Rafael R. Pacheco, DDS, MSc, PhD</p>
+</div>
+
+</body>
+</html>
